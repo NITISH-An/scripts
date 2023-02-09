@@ -1,0 +1,19 @@
+Rufus Link : https://rufus.ie
+ISO : https://www.microsoft.com/en-us/software-download/windows10
+
+Hardware Hash:-
+
+md c:\HWID
+Set-Location c:\HWID
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+Install-Script -Name Get-WindowsAutoPilotInfo -Force
+$serial = (Get-CIMInstance win32_bios).SerialNumber
+Get-WindowsAutoPilotInfo.ps1 -OutputFile AutoPilotHWID_$serial.csv
+
+
+cd "C:\Windows\system32\sysprep"
+sysprep.exe /oobe
+
+
+
+
