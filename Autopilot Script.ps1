@@ -1,4 +1,4 @@
-﻿# Credential to be hidden
+# Credential to be hidden
 $clientId = "7b2f0500-d6b5-4ce8-b19d-461f40b7d47d"
 $tenantId = "ea2db08c-1eea-4886-80fb-c5a6135ca88e"
 $clientSecret = "mZ.8Q~PPrbzx2wRzD1oF1cOLIlPE-A_o.BP~mdgO"
@@ -15,16 +15,10 @@ $body = @{
 $accessToken = Invoke-RestMethod -Uri $tokenEndpoint -Method Post -Body $body
 
 # Path to the CSV file
-$csvFilePath = "C:\Users\Public\Documents\Autopilot Devices for Deletion\Newfile_SerialNumber.csv"
+$csvFilePath = "C:\Users\Public\Documents\Newfile_SerialNumber.csv"
 
 # Read serial numbers from the CSV file
 $serialNumbers = Import-Csv -Path $csvFilePath | Select-Object -ExpandProperty SerialNumber
-
-# Initialize an array to store results
-$deviceIds = @()
-
-
-    # Your existing code...
 
 # Loop through each serial number
 foreach ($serialNumber in $serialNumbers) 
@@ -37,16 +31,18 @@ foreach ($serialNumber in $serialNumbers)
     $filteredResponse = $response.value | Where-Object { $_.serialNumber -eq $serialNumber }
 
     # Check if any devices are found
-    if ($filteredResponse.serialNumber.count -gt 0) {
-        # Loop through each device
-        foreach ($device in $filteredResponse.value) {
-            # Construct the URL for the delete request
-            $deleteUrl = "https://graph.microsoft.com/beta/deviceManagement/windowsAutopilotDeviceIdentities/$($device.id)"
-
+    if ($filteredResponse.serialNumber.count -gt 0) 
+    {
+        foreach ($device in $filteredResponse) {
+            $deviceId = $device.id
+            # The URL for the delete request
+            $deleteUrl = "https://graph.microsoft.com/beta/deviceManagement/windowsAutopilotDeviceIdentities/$deviceId"
             # Make the delete request to Microsoft Graph API
-           Invoke-RestMethod -Uri $deleteUrl -Method Delete -Headers @{"Authorization" = "Bearer $($accessToken.access_token)"} -Verbose
+            Invoke-RestMethod -Uri $deleteUrl -Method Delete -Headers @{"Authorization" = "Bearer $($accessToken.access_token)"} -Verbose
         }
-    } else {
+    } 
+    else 
+    {
         Write-Host "Device with serial number $($serialNumber) not found."
     }
 }
